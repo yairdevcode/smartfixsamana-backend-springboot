@@ -37,5 +37,4 @@ public interface IInventoryMovementRepository extends JpaRepository<InventoryMov
      * Find all movements with pagination
      */
     Page<InventoryMovement> findAll(Pageable pageable);
-
 }

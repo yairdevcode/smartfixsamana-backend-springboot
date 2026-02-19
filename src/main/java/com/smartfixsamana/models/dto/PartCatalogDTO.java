@@ -1,10 +1,9 @@
 package com.smartfixsamana.models.dto;
 
-import jakarta.validation.constraints.NotBlank;
-
 public record PartCatalogDTO(
-        @NotBlank String name,
+        String name,
         String description,
+        Long partTypeId,
         Long phoneId,
         Integer quantity,
         Integer minStock,

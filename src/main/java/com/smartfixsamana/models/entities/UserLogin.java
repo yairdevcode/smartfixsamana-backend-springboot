@@ -5,17 +5,7 @@ import java.util.List;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.UniqueConstraint;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -28,10 +18,12 @@ public class UserLogin {
     private Long id;
 
     @NotBlank
+    @Column(unique = true)
     private String email;
 
     @NotBlank
     @Size(min = 4, max = 12)
+    @Column(unique = true)
     private String username;
 
     @NotBlank

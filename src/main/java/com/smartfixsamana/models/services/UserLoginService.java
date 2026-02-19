@@ -11,6 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.smartfixsamana.exceptions.DuplicateResourceException;
 import com.smartfixsamana.models.entities.Role;
 import com.smartfixsamana.models.entities.UserLogin;
 import com.smartfixsamana.models.repositories.IRolRepository;
@@ -40,6 +41,14 @@ public class UserLoginService {
 
     public UserLogin save(UserLogin user) {
 
+        // Validar duplicados
+        if (iUserLoginRepository.existsByUsername(user.getUsername())) {
+            throw new DuplicateResourceException("El nombre de usuario '" + user.getUsername() + "' ya está registrado.");
+        }
+        if (iUserLoginRepository.existsByEmail(user.getEmail())) {
+            throw new DuplicateResourceException("El correo '" + user.getEmail() + "' ya está registrado.");
+        }
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         // Verificamos si hay un usuario autenticado
@@ -67,6 +76,17 @@ public class UserLoginService {
 
         if (userOptional.isPresent()) {
             UserLogin userDb = userOptional.get();
+
+            if (!userDb.getUsername().equals(user.getUsername())
+                    && iUserLoginRepository.existsByUsername(user.getUsername())) {
+                throw new DuplicateResourceException("El nombre de usuario '" + user.getUsername() + "' ya está registrado.");
+            }
+            // Validar solo si cambió el email
+            if (!userDb.getEmail().equals(user.getEmail())
+                    && iUserLoginRepository.existsByEmail(user.getEmail())) {
+                throw new DuplicateResourceException("El correo '" + user.getEmail() + "' ya está registrado.");
+            }
+
             userDb.setEmail(user.getEmail());
             userDb.setUsername(user.getUsername());
             userDb.setRoles(getRoles(user));

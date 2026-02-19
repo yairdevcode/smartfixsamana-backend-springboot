@@ -4,7 +4,6 @@ import java.io.Serial;
 import java.io.Serializable;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "parts_catalog")
@@ -14,10 +13,13 @@ public class PartCatalog implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotBlank
 	private String name;
 
 	private String description;
+
+	@ManyToOne
+	@JoinColumn(name = "part_type_id")
+	private PartType partType;
 
 	@ManyToOne
 	@JoinColumn(name = "phone_id")
@@ -55,6 +57,14 @@ public class PartCatalog implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public PartType getPartType() {
+		return partType;
+	}
+
+	public void setPartType(PartType partType) {
+		this.partType = partType;
 	}
 
 	public Phone getPhone() {

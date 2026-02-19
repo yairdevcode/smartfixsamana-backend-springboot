@@ -6,6 +6,8 @@ public record PartCatalogResponse(
         Long id,
         String name,
         String description,
+        Long partTypeId,
+        String partTypeName,
         Long phoneId,
         String phoneBrand,
         String phoneModel,
@@ -16,6 +18,13 @@ public record PartCatalogResponse(
         Boolean isLowStock
 ) {
     public static PartCatalogResponse fromEntity(PartCatalog partCatalog) {
+        Long partTypeId = null;
+        String partTypeName = null;
+        if (partCatalog.getPartType() != null) {
+            partTypeId = partCatalog.getPartType().getId();
+            partTypeName = partCatalog.getPartType().getName();
+        }
+
         Long phoneId = null;
         String phoneBrand = null;
         String phoneModel = null;
@@ -24,11 +33,15 @@ public record PartCatalogResponse(
             phoneBrand = partCatalog.getPhone().getBrand();
             phoneModel = partCatalog.getPhone().getModel();
         }
+
         boolean isLowStock = partCatalog.getQuantity() <= partCatalog.getMinStock();
+
         return new PartCatalogResponse(
                 partCatalog.getId(),
                 partCatalog.getName(),
                 partCatalog.getDescription(),
+                partTypeId,
+                partTypeName,
                 phoneId,
                 phoneBrand,
                 phoneModel,

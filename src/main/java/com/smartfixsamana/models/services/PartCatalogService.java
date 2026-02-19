@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.smartfixsamana.models.dto.PartCatalogDTO;
 import com.smartfixsamana.models.entities.PartCatalog;
+import com.smartfixsamana.models.entities.PartType;
 import com.smartfixsamana.models.entities.Phone;
 import com.smartfixsamana.models.repositories.IPartCatalogRepository;
 
@@ -21,10 +22,13 @@ public class PartCatalogService {
 
     private final IPartCatalogRepository partCatalogRepository;
     private final PhoneService phoneService;
+    private final PartTypeService partTypeService;
 
-    public PartCatalogService(IPartCatalogRepository partCatalogRepository, PhoneService phoneService) {
+    public PartCatalogService(IPartCatalogRepository partCatalogRepository, PhoneService phoneService,
+                              PartTypeService partTypeService) {
         this.partCatalogRepository = partCatalogRepository;
         this.phoneService = phoneService;
+        this.partTypeService = partTypeService;
     }
 
     /**
@@ -67,13 +71,32 @@ public class PartCatalogService {
     }
 
     private PartCatalog updateFromDTO(PartCatalog partCatalog, PartCatalogDTO dto) {
-        partCatalog.setName(dto.name());
         partCatalog.setDescription(dto.description());
         partCatalog.setQuantity(dto.quantity() != null ? dto.quantity() : 0);
         partCatalog.setMinStock(dto.minStock() != null ? dto.minStock() : 5);
         partCatalog.setPurchasePrice(dto.purchasePrice());
         partCatalog.setSalePrice(dto.salePrice());
 
+        // Set PartType (optional for backwards compatibility, but recommended)
+        // The name is derived from the PartType
+        if (dto.partTypeId() != null) {
+            PartType partType = partTypeService.findById(dto.partTypeId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Tipo de repuesto no encontrado con ID: " + dto.partTypeId()));
+            partCatalog.setPartType(partType);
+            // Set name from PartType if not provided
+            if (dto.name() == null || dto.name().isBlank()) {
+                partCatalog.setName(partType.getName());
+            } else {
+                partCatalog.setName(dto.name());
+            }
+        } else {
+            partCatalog.setPartType(null);
+            // Use provided name or empty string
+            partCatalog.setName(dto.name() != null ? dto.name() : "");
+        }
+
+        // Set Phone (optional)
         if (dto.phoneId() != null) {
             Phone phone = phoneService.findById(dto.phoneId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,

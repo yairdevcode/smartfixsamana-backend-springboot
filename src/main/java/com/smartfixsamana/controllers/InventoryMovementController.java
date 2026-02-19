@@ -49,7 +49,7 @@ public class InventoryMovementController {
     @GetMapping
     public ResponseEntity<Page<InventoryMovement>> findAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "4") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(required = false) Long partCatalogId,

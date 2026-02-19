@@ -74,6 +74,14 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.PATCH, "/repairs/{id}/labor-cost").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/repairs/{id}").hasRole("ADMIN")
 
+                            // Tipos de Repuesto
+                            .requestMatchers(HttpMethod.GET, "/api/part-types").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/api/part-types/search").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/api/part-types/{id}").hasAnyRole("USER", "ADMIN")
+                            .requestMatchers(HttpMethod.POST, "/api/part-types").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.PUT, "/api/part-types/{id}").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/api/part-types/{id}").hasRole("ADMIN")
+
                             // Catálogo Repuestos - RUTAS ESPECÍFICAS PRIMERO
                             .requestMatchers(HttpMethod.GET, "/api/parts-catalog").permitAll()
                             .requestMatchers(HttpMethod.GET, "/api/parts-catalog/search").permitAll()

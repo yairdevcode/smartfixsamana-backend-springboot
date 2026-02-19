@@ -11,4 +11,9 @@ public interface IUserLoginRepository extends CrudRepository<UserLogin, Long>{
 
     Optional<UserLogin> findByUsername(String username);
 
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
+
 }
