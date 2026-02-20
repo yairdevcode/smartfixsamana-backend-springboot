@@ -123,7 +123,10 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedOrigins(List.of("http://localhost:4200",
+                "https://smartfixsamana.com",
+                "https://www.smartfixsamana.com",
+                "http://smartfixsamana.com"));
         config.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
