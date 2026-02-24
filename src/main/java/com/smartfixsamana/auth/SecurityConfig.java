@@ -100,6 +100,18 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/api/repairs/{repairId}/parts").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/api/repairs/{repairId}/parts/{repairPartId}").hasRole("ADMIN")
 
+                            // ═══════════════ REPARACIONES EXTERNAS ═══════════════
+                            .requestMatchers(HttpMethod.GET, "/api/external-repairs/**").hasAnyRole("USER", "ADMIN")
+                            .requestMatchers(HttpMethod.POST, "/api/external-repairs/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.PUT, "/api/external-repairs/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/api/external-repairs/**").hasRole("ADMIN")
+
+                            // ═══════════════ SETTLEMENTS (LIQUIDACIONES) ═══════════════
+                            .requestMatchers(HttpMethod.GET, "/api/settlements/**").hasAnyRole("USER", "ADMIN")
+                            .requestMatchers(HttpMethod.POST, "/api/settlements/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.PUT, "/api/settlements/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/api/settlements/**").hasRole("ADMIN")
+
                                           //InventoryMovement
                             .requestMatchers(HttpMethod.GET, "/api/inventory-movements").permitAll()
                             .requestMatchers(HttpMethod.GET, "/api/inventory-movements/{id}").hasAnyRole("USER", "ADMIN")
