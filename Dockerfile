@@ -1,16 +1,16 @@
 # Imagen de Java
-FROM openjdk:17-jdk-slim
+# Stage 1: Compilar con Maven
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src
+RUN mvn clean package -DskipTests -B
 
-ARG JAR_FILE=target/smartfixsamana_back-0.0.1.jar
-
-# Copia del jar compilado al contenedor
-COPY ${JAR_FILE} app_smartfixsamana.jar
-
-# Definir el perfil activo (clave para Spring Boot)
+# Stage 2: Ejecutar
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 ENV SPRING_PROFILES_ACTIVE=prod
-
-# Puerto que va a usar el contenedor
 EXPOSE 8080
-
-# Comando para ejecutar el jar
-ENTRYPOINT ["java", "-jar", "app_smartfixsamana.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -84,7 +84,9 @@ public class SecurityConfig {
 
                             // Catálogo Repuestos - RUTAS ESPECÍFICAS PRIMERO
                             .requestMatchers(HttpMethod.GET, "/api/parts-catalog").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/api/parts-catalog/all").permitAll()
                             .requestMatchers(HttpMethod.GET, "/api/parts-catalog/search").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/api/parts-catalog/search/available").permitAll()
                             .requestMatchers(HttpMethod.GET, "/api/parts-catalog/available").permitAll()
                             .requestMatchers(HttpMethod.GET, "/api/parts-catalog/low-stock").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.GET, "/api/parts-catalog/by-phone/{phoneId}").hasAnyRole("USER", "ADMIN")

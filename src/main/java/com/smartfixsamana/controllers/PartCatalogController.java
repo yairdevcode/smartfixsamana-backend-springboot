@@ -94,6 +94,15 @@ public class PartCatalogController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/search/available")
+    public List<PartCatalogResponse> searchAvailableParts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long phoneId) {
+        return partCatalogService.searchAvailableParts(name, phoneId).stream()
+                .map(PartCatalogResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     @GetMapping("/low-stock")
     public List<PartCatalogResponse> findLowStock() {
         return partCatalogService.getLowStockParts().stream()

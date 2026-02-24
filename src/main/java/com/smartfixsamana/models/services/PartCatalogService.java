@@ -148,6 +148,15 @@ public class PartCatalogService {
     }
 
     /**
+     * Searches available parts (quantity > 0) by name and/or phone ID.
+     * @param name Optional part name filter (case-insensitive partial match)
+     * @param phoneId Optional phone ID filter
+     */
+    public List<PartCatalog> searchAvailableParts(String name, Long phoneId) {
+        return partCatalogRepository.searchAvailableParts(name, phoneId);
+    }
+
+    /**
      * Finds parts where quantity <= minStock (low stock alert).
      */
     public List<PartCatalog> getLowStockParts() {
