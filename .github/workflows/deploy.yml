@@ -1,4 +1,4 @@
-name: Deploy Backend to Hetzner
+name: Deeploy Backend to Hetzner
 
 on:
   push:
