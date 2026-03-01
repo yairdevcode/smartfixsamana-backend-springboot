@@ -39,9 +39,11 @@ public interface IPartCatalogRepository extends JpaRepository<PartCatalog, Long>
     /**
      * Paginated search with optional filters for name and phoneId.
      */
-    @Query("SELECT pc FROM PartCatalog pc WHERE " +
-           "(:name IS NULL OR LOWER(pc.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
-           "(:phoneId IS NULL OR pc.phone.id = :phoneId)")
+    @Query("SELECT pc FROM PartCatalog pc LEFT JOIN pc.phone p WHERE " +
+           "(:name IS NULL OR LOWER(pc.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
+            "OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :name, '%')) " +
+            "OR LOWER(p.model) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
+           "(:phoneId IS NULL OR p.id = :phoneId)")
     Page<PartCatalog> searchPartsPaginated(
             @Param("name") String name,
             @Param("phoneId") Long phoneId,
