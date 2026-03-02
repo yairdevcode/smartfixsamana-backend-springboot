@@ -135,6 +135,72 @@ public class ExternalRepairService {
                 entregadas.size(), pendientesRecoger.size());
     }
 
+    /**
+     * Preview reconciliation for a specific settlement: matches imported Excel rows against ALL repairs
+     * in the settlement (both new repairs and carried-over PENDIENTE_RECOGER from previous periods).
+     */
+    public ImportReconciliationResponse previewReconciliationBySettlement(
+            List<ExcelImportRow> importedRows, Long settlementId, LocalDate settlementStartDate) {
+        List<ExternalRepair> settlementRepairs = repository.findBySettlementId(settlementId);
+        return reconcileAgainstRepairs(importedRows, settlementRepairs, settlementStartDate, false);
+    }
+
+    /**
+     * Apply reconciliation for a specific settlement: marks matched repairs as PENDIENTE_RECOGER,
+     * unmatched as ENTREGADO. Works against ALL repairs in the settlement.
+     */
+    @Transactional
+    public ImportReconciliationResponse applyReconciliationBySettlement(
+            List<ExcelImportRow> importedRows, Long settlementId, LocalDate settlementStartDate) {
+        List<ExternalRepair> settlementRepairs = repository.findBySettlementId(settlementId);
+        return reconcileAgainstRepairs(importedRows, settlementRepairs, settlementStartDate, true);
+    }
+
+    private ImportReconciliationResponse reconcileAgainstRepairs(
+            List<ExcelImportRow> importedRows, List<ExternalRepair> repairs,
+            LocalDate settlementStartDate, boolean apply) {
+
+        Set<String> importedKeys = importedRows.stream()
+                .map(row -> buildMatchKey(row.clientName(), row.phoneBrand(), row.solution(), row.repairPrice()))
+                .collect(Collectors.toSet());
+
+        List<ExternalRepairResponse> entregadas = new ArrayList<>();
+        List<ExternalRepairResponse> pendientesRecoger = new ArrayList<>();
+        int entregadasNuevas = 0;
+        int entregadasPendientesAnteriores = 0;
+
+        for (ExternalRepair repair : repairs) {
+            String key = buildMatchKey(repair.getClientName(), repair.getPhoneBrand(),
+                    repair.getSolution(), repair.getRepairPrice());
+            boolean isCarriedOver = repair.getDate().isBefore(settlementStartDate);
+
+            if (importedKeys.contains(key)) {
+                if (apply) {
+                    repair.setStatus(ExternalRepairStatus.PENDIENTE_RECOGER);
+                }
+                pendientesRecoger.add(ExternalRepairResponse.fromEntity(repair));
+            } else {
+                if (apply) {
+                    repair.setStatus(ExternalRepairStatus.ENTREGADO);
+                }
+                entregadas.add(ExternalRepairResponse.fromEntity(repair));
+                if (isCarriedOver) {
+                    entregadasPendientesAnteriores++;
+                } else {
+                    entregadasNuevas++;
+                }
+            }
+        }
+
+        if (apply) {
+            repository.saveAll(repairs);
+        }
+
+        return new ImportReconciliationResponse(entregadas, pendientesRecoger,
+                entregadas.size(), pendientesRecoger.size(),
+                entregadasNuevas, entregadasPendientesAnteriores);
+    }
+
     private String buildMatchKey(String clientName, String phoneBrand, String solution, Double repairPrice) {
         return (clientName != null ? clientName.trim().toLowerCase() : "") + "|" +
                 (phoneBrand != null ? phoneBrand.trim().toLowerCase() : "") + "|" +

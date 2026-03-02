@@ -23,6 +23,11 @@ public interface IExternalRepairRepository extends JpaRepository<ExternalRepair,
 
     List<ExternalRepair> findByStatusAndSettlementIsNotNull(ExternalRepairStatus status);
 
+    List<ExternalRepair> findBySettlementIsNullAndStatusAndDateBetween(
+            ExternalRepairStatus status, LocalDate start, LocalDate end);
+
+    List<ExternalRepair> findBySettlementId(Long settlementId);
+
     @Query("SELECT e FROM ExternalRepair e WHERE " +
             "(:status IS NULL OR e.status = :status) AND " +
             "(:startDate IS NULL OR e.date >= :startDate) AND " +

@@ -16,9 +16,14 @@ public record SettlementResponse(
         Double totalStoreShare,
         SettlementStatus status,
         LocalDateTime createdAt,
-        int repairCount
+        int repairCount,
+        String warning
 ) {
     public static SettlementResponse fromEntity(Settlement entity) {
+        return fromEntity(entity, null);
+    }
+
+    public static SettlementResponse fromEntity(Settlement entity, String warning) {
         return new SettlementResponse(
                 entity.getId(),
                 entity.getStartDate(),
@@ -29,7 +34,8 @@ public record SettlementResponse(
                 entity.getTotalStoreShare(),
                 entity.getStatus(),
                 entity.getCreatedAt(),
-                entity.getRepairs() != null ? entity.getRepairs().size() : 0
+                entity.getRepairs() != null ? entity.getRepairs().size() : 0,
+                warning
         );
     }
 }

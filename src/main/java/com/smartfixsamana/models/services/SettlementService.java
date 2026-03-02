@@ -15,7 +15,9 @@ import com.smartfixsamana.models.enums.ExternalRepairStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -42,22 +44,33 @@ public class SettlementService {
         return settlementRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
     }
 
+    /**
+     * Creates a settlement. Returns a map with "settlement" and optionally "warning".
+     */
     @Transactional
-    public Settlement createSettlement(LocalDate startDate, LocalDate endDate) {
-        // 1. New unsettled repairs within the date range
-        List<ExternalRepair> unsettledRepairs = externalRepairRepository
-                .findBySettlementIsNullAndDateBetween(startDate, endDate);
+    public Map<String, Object> createSettlement(LocalDate startDate, LocalDate endDate) {
+        // 1. New unsettled REPARADO repairs within the date range
+        List<ExternalRepair> newRepairs = externalRepairRepository
+                .findBySettlementIsNullAndStatusAndDateBetween(
+                        ExternalRepairStatus.REPARADO, startDate, endDate);
 
         // 2. Carried-over repairs: PENDIENTE_RECOGER from any previous settlement
         List<ExternalRepair> carriedOverRepairs = externalRepairRepository
                 .findByStatusAndSettlementIsNotNull(ExternalRepairStatus.PENDIENTE_RECOGER);
 
         // Combine both lists
-        List<ExternalRepair> allRepairs = new ArrayList<>(unsettledRepairs);
+        List<ExternalRepair> allRepairs = new ArrayList<>(newRepairs);
         allRepairs.addAll(carriedOverRepairs);
 
         if (allRepairs.isEmpty()) {
-            throw new RuntimeException("No hay reparaciones sin liquidar en el rango de fechas seleccionado.");
+            throw new RuntimeException("No hay reparaciones disponibles para liquidar.");
+        }
+
+        String warning = null;
+        if (newRepairs.isEmpty() && !carriedOverRepairs.isEmpty()) {
+            warning = "No se encontraron reparaciones nuevas en este rango de fechas. "
+                    + "La liquidación solo incluye " + carriedOverRepairs.size()
+                    + " reparación(es) pendiente(s) de recoger de períodos anteriores.";
         }
 
         double totalRepairPrice = 0;
@@ -89,6 +102,12 @@ public class SettlementService {
         externalRepairRepository.saveAll(allRepairs);
 
         saved.setRepairs(allRepairs);
-        return saved;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("settlement", saved);
+        if (warning != null) {
+            result.put("warning", warning);
+        }
+        return result;
     }
 }
