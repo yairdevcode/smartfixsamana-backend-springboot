@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartfixsamana.models.entities.Phone;
-import com.smartfixsamana.services.PhoneService;
+import com.smartfixsamana.models.services.PhoneService;
 
 import jakarta.validation.Valid;
 

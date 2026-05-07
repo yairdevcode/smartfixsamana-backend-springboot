@@ -1,4 +1,4 @@
-package com.smartfixsamana.services;
+package com.smartfixsamana.models.services;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.smartfixsamana.models.entities.Phone;
-import com.smartfixsamana.repositories.IPhoneRepository;
+import com.smartfixsamana.models.repositories.IPhoneRepository;
 
 @Service
 public class PhoneService {

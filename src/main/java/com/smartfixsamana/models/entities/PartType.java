@@ -66,11 +66,17 @@ public class PartType implements Serializable {
 		return createdAt;
 	}
 
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
 	}
 
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
 
 	@Serial
 	private static final long serialVersionUID = 1L;

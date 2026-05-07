@@ -1,4 +1,4 @@
-package com.smartfixsamana.repositories;
+package com.smartfixsamana.models.repositories;
 
 import java.util.List;
 
@@ -10,6 +10,6 @@ public interface IRepairPartRepository extends CrudRepository<RepairPart, Long> 
 
     List<RepairPart> findByRepairId(Long repairId);
 
-
+    List<RepairPart> findByPartCatalogId(Long partCatalogId);
 
 }

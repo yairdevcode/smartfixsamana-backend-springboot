@@ -84,7 +84,9 @@ public class RepairPart implements Serializable {
 		return createdAt;
 	}
 
-
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 
 	@Serial
 	private static final long serialVersionUID = 1L;

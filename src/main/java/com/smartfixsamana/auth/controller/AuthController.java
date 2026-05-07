@@ -4,7 +4,7 @@ import com.smartfixsamana.auth.JwtTokenProvider;
 import com.smartfixsamana.auth.dto.LoginRequestDTO;
 import com.smartfixsamana.auth.dto.LoginResponseDTO;
 import com.smartfixsamana.models.entities.UserLogin;
-import com.smartfixsamana.repositories.IUserLoginRepository;
+import com.smartfixsamana.models.repositories.IUserLoginRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

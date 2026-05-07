@@ -1,4 +1,4 @@
-package com.smartfixsamana.services;
+package com.smartfixsamana.models.services;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ import com.smartfixsamana.models.dto.RepairPartRequest;
 import com.smartfixsamana.models.entities.PartCatalog;
 import com.smartfixsamana.models.entities.Repair;
 import com.smartfixsamana.models.entities.RepairPart;
-import com.smartfixsamana.repositories.IRepairPartRepository;
-import com.smartfixsamana.repositories.IRepairRepository;
+import com.smartfixsamana.models.repositories.IRepairPartRepository;
+import com.smartfixsamana.models.repositories.IRepairRepository;
 
 @Service
 public class RepairPartService {

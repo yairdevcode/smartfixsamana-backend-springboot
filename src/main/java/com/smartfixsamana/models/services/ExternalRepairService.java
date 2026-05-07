@@ -1,12 +1,12 @@
-package com.smartfixsamana.services;
+package com.smartfixsamana.models.services;
 
 import com.smartfixsamana.models.dto.ExternalRepairDTO;
 import com.smartfixsamana.models.dto.ExternalRepairResponse;
 import com.smartfixsamana.models.dto.ImportReconciliationResponse;
 import com.smartfixsamana.models.entities.ExternalRepair;
 import com.smartfixsamana.models.enums.ExternalRepairStatus;
-import com.smartfixsamana.repositories.IExternalRepairRepository;
-import com.smartfixsamana.services.ExternalRepairExcelService.ExcelImportRow;
+import com.smartfixsamana.models.repositories.IExternalRepairRepository;
+import com.smartfixsamana.models.services.ExternalRepairExcelService.ExcelImportRow;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

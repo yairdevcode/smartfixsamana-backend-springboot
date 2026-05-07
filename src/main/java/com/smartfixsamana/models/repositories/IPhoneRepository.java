@@ -1,4 +1,4 @@
-package com.smartfixsamana.repositories;
+package com.smartfixsamana.models.repositories;
 
 
 import org.springframework.data.domain.Page;

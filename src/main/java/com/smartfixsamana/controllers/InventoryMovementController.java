@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartfixsamana.models.dto.InventoryMovementDTO;
 import com.smartfixsamana.models.entities.InventoryMovement;
 import com.smartfixsamana.models.enums.MovementType;
-import com.smartfixsamana.services.InventoryMovementService;
+import com.smartfixsamana.models.services.InventoryMovementService;
 
 import jakarta.validation.Valid;
 

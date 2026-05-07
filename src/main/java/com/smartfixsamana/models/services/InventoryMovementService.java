@@ -1,4 +1,4 @@
-package com.smartfixsamana.services;
+package com.smartfixsamana.models.services;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +18,7 @@ import com.smartfixsamana.models.entities.InventoryMovement;
 import com.smartfixsamana.models.entities.PartCatalog;
 import com.smartfixsamana.models.entities.Repair;
 import com.smartfixsamana.models.enums.MovementType;
-import com.smartfixsamana.repositories.IInventoryMovementRepository;
+import com.smartfixsamana.models.repositories.IInventoryMovementRepository;
 
 @Service
 public class InventoryMovementService {

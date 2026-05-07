@@ -12,7 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import com.smartfixsamana.models.entities.UserLogin;
-import com.smartfixsamana.services.UserLoginService;
+import com.smartfixsamana.models.services.UserLoginService;
 
 import jakarta.validation.Valid;
 

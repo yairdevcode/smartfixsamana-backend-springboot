@@ -1,4 +1,4 @@
-package com.smartfixsamana.repositories;
+package com.smartfixsamana.models.repositories;
 
 import java.util.List;
 
@@ -20,6 +20,8 @@ public interface IPartCatalogRepository extends JpaRepository<PartCatalog, Long>
     List<PartCatalog> findByPhoneId(Long phoneId);
 
     List<PartCatalog> findByNameContainingIgnoreCaseAndPhoneId(String name, Long phoneId);
+
+    List<PartCatalog> findByQuantityLessThanEqual(Integer quantity);
 
     List<PartCatalog> findByQuantityGreaterThan(Integer quantity);
 

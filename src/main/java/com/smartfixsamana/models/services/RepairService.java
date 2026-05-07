@@ -1,4 +1,4 @@
-package com.smartfixsamana.services;
+package com.smartfixsamana.models.services;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,7 @@ import com.smartfixsamana.models.dto.RepairDTO;
 import com.smartfixsamana.models.entities.Phone;
 import com.smartfixsamana.models.entities.Customer;
 import com.smartfixsamana.models.entities.Repair;
-import com.smartfixsamana.repositories.IRepairRepository;
+import com.smartfixsamana.models.repositories.IRepairRepository;
 
 @Service
 public class RepairService {
