@@ -1,4 +1,4 @@
-package com.smartfixsamana.models.services;
+package com.smartfixsamana.services;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,7 @@ import com.smartfixsamana.models.dto.PartCatalogDTO;
 import com.smartfixsamana.models.entities.PartCatalog;
 import com.smartfixsamana.models.entities.PartType;
 import com.smartfixsamana.models.entities.Phone;
-import com.smartfixsamana.models.repositories.IPartCatalogRepository;
+import com.smartfixsamana.repositories.IPartCatalogRepository;
 
 @Service
 public class PartCatalogService {

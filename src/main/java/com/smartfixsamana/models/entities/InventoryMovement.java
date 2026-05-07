@@ -55,10 +55,6 @@ public class InventoryMovement implements Serializable {
 		this.id = id;
 	}
 
-	public PartCatalog getPartCatalog() {
-		return partCatalog;
-	}
-
 	public void setPartCatalog(PartCatalog partCatalog) {
 		this.partCatalog = partCatalog;
 	}
@@ -71,9 +67,6 @@ public class InventoryMovement implements Serializable {
 		this.repair = repair;
 	}
 
-	public MovementType getMovementType() {
-		return movementType;
-	}
 
 	public void setMovementType(MovementType movementType) {
 		this.movementType = movementType;
@@ -87,25 +80,11 @@ public class InventoryMovement implements Serializable {
 		this.quantity = quantity;
 	}
 
-	public String getReason() {
-		return reason;
-	}
 
 	public void setReason(String reason) {
 		this.reason = reason;
 	}
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public String getNotes() {
-		return notes;
-	}
 
 	public void setNotes(String notes) {
 		this.notes = notes;

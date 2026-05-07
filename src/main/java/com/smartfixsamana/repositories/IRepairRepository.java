@@ -1,4 +1,4 @@
-package com.smartfixsamana.models.repositories;
+package com.smartfixsamana.repositories;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

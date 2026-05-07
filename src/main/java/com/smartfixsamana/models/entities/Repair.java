@@ -55,10 +55,6 @@ public class Repair implements Serializable{
 		this.id = id;
 	}
 
-	public Customer getCustomer() {
-		return customer;
-	}
-
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
 	}
@@ -71,16 +67,8 @@ public class Repair implements Serializable{
 		this.phone = phone;
 	}
 
-	public String getFault() {
-		return fault;
-	}
-
 	public void setFault(String fault) {
 		this.fault = fault;
-	}
-
-	public String getState() {
-		return state;
 	}
 
 	public void setState(String state) {
@@ -95,18 +83,6 @@ public class Repair implements Serializable{
 		this.date = date;
 	}
 
-	public List<RepairPart> getPartsUsed() {
-		return partsUsed;
-	}
-
-	public void setPartsUsed(List<RepairPart> partsUsed) {
-		this.partsUsed = partsUsed;
-	}
-
-	public Double getTotalPartsCost() {
-		return totalPartsCost;
-	}
-
 	public void setTotalPartsCost(Double totalPartsCost) {
 		this.totalPartsCost = totalPartsCost;
 	}
@@ -117,14 +93,6 @@ public class Repair implements Serializable{
 
 	public void setLaborCost(Double laborCost) {
 		this.laborCost = laborCost;
-	}
-
-	public Double getTotalCost() {
-		return totalCost;
-	}
-
-	public void setTotalCost(Double totalCost) {
-		this.totalCost = totalCost;
 	}
 
 	public void recalculateTotalCost() {

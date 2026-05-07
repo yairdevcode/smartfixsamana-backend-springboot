@@ -1,10 +1,10 @@
-package com.smartfixsamana.models.services;
+package com.smartfixsamana.services;
 
 import com.smartfixsamana.models.entities.ExternalRepair;
 import com.smartfixsamana.models.entities.Settlement;
 import com.smartfixsamana.models.enums.SettlementStatus;
-import com.smartfixsamana.models.repositories.IExternalRepairRepository;
-import com.smartfixsamana.models.repositories.ISettlementRepository;
+import com.smartfixsamana.repositories.IExternalRepairRepository;
+import com.smartfixsamana.repositories.ISettlementRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartfixsamana.models.dto.PartTypeDTO;
 import com.smartfixsamana.models.dto.PartTypeResponse;
 import com.smartfixsamana.models.entities.PartType;
-import com.smartfixsamana.models.services.PartTypeService;
+import com.smartfixsamana.services.PartTypeService;
 
 import jakarta.validation.Valid;
 

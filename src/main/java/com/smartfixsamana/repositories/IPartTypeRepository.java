@@ -1,4 +1,4 @@
-package com.smartfixsamana.models.repositories;
+package com.smartfixsamana.repositories;
 
 import java.util.List;
 import java.util.Optional;

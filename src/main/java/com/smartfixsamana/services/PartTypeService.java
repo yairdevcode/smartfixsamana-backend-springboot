@@ -1,4 +1,4 @@
-package com.smartfixsamana.models.services;
+package com.smartfixsamana.services;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.smartfixsamana.models.dto.PartTypeDTO;
 import com.smartfixsamana.models.entities.PartType;
-import com.smartfixsamana.models.repositories.IPartTypeRepository;
+import com.smartfixsamana.repositories.IPartTypeRepository;
 
 @Service
 public class PartTypeService {

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartfixsamana.models.dto.PartCatalogDTO;
 import com.smartfixsamana.models.dto.PartCatalogResponse;
 import com.smartfixsamana.models.entities.PartCatalog;
-import com.smartfixsamana.models.services.PartCatalogService;
+import com.smartfixsamana.services.PartCatalogService;
 
 import jakarta.validation.Valid;
 

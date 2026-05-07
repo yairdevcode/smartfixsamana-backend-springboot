@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartfixsamana.models.entities.Customer;
-import com.smartfixsamana.models.services.CustomerService;
+import com.smartfixsamana.services.CustomerService;
 
 import jakarta.validation.Valid;
 

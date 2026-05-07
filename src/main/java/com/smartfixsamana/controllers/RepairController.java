@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.smartfixsamana.models.dto.RepairDTO;
 import com.smartfixsamana.models.entities.Repair;
-import com.smartfixsamana.models.services.RepairService;
+import com.smartfixsamana.services.RepairService;
 
 import jakarta.validation.Valid;
 

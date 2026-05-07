@@ -1,4 +1,4 @@
-package com.smartfixsamana.models.services;
+package com.smartfixsamana.services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 import com.smartfixsamana.exceptions.DuplicateResourceException;
 import com.smartfixsamana.models.entities.Role;
 import com.smartfixsamana.models.entities.UserLogin;
-import com.smartfixsamana.models.repositories.IRolRepository;
-import com.smartfixsamana.models.repositories.IUserLoginRepository;
+import com.smartfixsamana.repositories.IRolRepository;
+import com.smartfixsamana.repositories.IUserLoginRepository;
 
 
 @Service

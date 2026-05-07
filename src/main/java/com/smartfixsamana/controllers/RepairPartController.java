@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartfixsamana.models.dto.RepairPartRequest;
 import com.smartfixsamana.models.dto.RepairPartResponse;
 import com.smartfixsamana.models.entities.RepairPart;
-import com.smartfixsamana.models.services.RepairPartService;
+import com.smartfixsamana.services.RepairPartService;
 
 import jakarta.validation.Valid;
 
@@ -53,9 +53,8 @@ public class RepairPartController {
      * Remove a part from a repair.
      * DELETE /api/repairs/{repairId}/parts/{repairPartId}
      */
-    @DeleteMapping("/{repairId}/parts/{repairPartId}")
+    @DeleteMapping("/parts/{repairPartId}")
     public ResponseEntity<Void> removePartFromRepair(
-            @PathVariable Long repairId,
             @PathVariable Long repairPartId) {
         repairPartService.removePartFromRepair(repairPartId);
         return ResponseEntity.noContent().build();

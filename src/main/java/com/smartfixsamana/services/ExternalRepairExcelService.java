@@ -1,4 +1,4 @@
-package com.smartfixsamana.models.services;
+package com.smartfixsamana.services;
 
 import com.smartfixsamana.models.entities.ExternalRepair;
 import com.smartfixsamana.models.enums.ExternalRepairStatus;

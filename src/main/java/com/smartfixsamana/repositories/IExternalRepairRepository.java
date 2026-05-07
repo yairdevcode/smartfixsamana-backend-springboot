@@ -1,4 +1,4 @@
-package com.smartfixsamana.models.repositories;
+package com.smartfixsamana.repositories;
 
 import com.smartfixsamana.models.entities.ExternalRepair;
 import com.smartfixsamana.models.enums.ExternalRepairStatus;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface IExternalRepairRepository extends JpaRepository<ExternalRepair, Long> {
 
-    Page<ExternalRepair> findByStatus(ExternalRepairStatus status, Pageable pageable);
+
 
     List<ExternalRepair> findByDateBetween(LocalDate start, LocalDate end);
 
