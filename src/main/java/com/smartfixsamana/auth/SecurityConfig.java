@@ -112,6 +112,9 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.PUT, "/api/settlements/**").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.DELETE, "/api/settlements/**").hasRole("ADMIN")
 
+                            // ═══════════════ GANANCIAS (EARNINGS) ═══════════════
+                            .requestMatchers(HttpMethod.GET, "/api/earnings/**").hasAnyRole("USER", "ADMIN")
+
                                           //InventoryMovement
                             .requestMatchers(HttpMethod.GET, "/api/inventory-movements").permitAll()
                             .requestMatchers(HttpMethod.GET, "/api/inventory-movements/{id}").hasAnyRole("USER", "ADMIN")
