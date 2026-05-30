@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,7 +36,7 @@ public class RepairService {
     }
 
     public List<Repair> getAll() {
-        return (List<Repair>) iRepairRepository.findAll();
+        return (List<Repair>) iRepairRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     public Optional<Repair> getById(Long id) {
