@@ -12,6 +12,7 @@ import com.smartfixsamana.models.repositories.IRepairRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,8 @@ import java.util.List;
  */
 @Service
 public class EarningsService {
+
+    private static final ZoneId BUSINESS_ZONE = ZoneId.of("America/Bogota");
 
     private final IRepairRepository repairRepository;
     private final IExternalRepairRepository externalRepairRepository;
@@ -79,7 +82,7 @@ public class EarningsService {
     }
 
     public EarningsSummaryResponse getSummary() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(BUSINESS_ZONE);
         DailyEarningsResponse todayEarnings = getDailyEarnings(today);
         RangeEarningsResponse last30Days = getRangeEarnings(today.minusDays(30), today);
         RangeEarningsResponse currentMonth = getRangeEarnings(
@@ -124,4 +127,5 @@ public class EarningsService {
     private double round(double value) {
         return Math.round(value * 100.0) / 100.0;
     }
+
 }

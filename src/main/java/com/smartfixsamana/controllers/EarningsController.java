@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @RestController
 @RequestMapping("/api/earnings")
 public class EarningsController {
+
+    private static final ZoneId BUSINESS_ZONE = ZoneId.of("America/Bogota");
 
     private final EarningsService earningsService;
 
@@ -33,7 +36,7 @@ public class EarningsController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         if (date == null) {
-            date = LocalDate.now();
+            date = LocalDate.now(BUSINESS_ZONE);
         }
         return ResponseEntity.ok(earningsService.getDailyEarnings(date));
     }
