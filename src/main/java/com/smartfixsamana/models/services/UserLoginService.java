@@ -2,6 +2,7 @@ package com.smartfixsamana.models.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -41,11 +42,14 @@ public class UserLoginService {
 
     public UserLogin save(UserLogin user) {
 
+        // Normalizar antes de validar duplicados, para que la comparación sea consistente
+        user.setEmail(normalizeEmail(user.getEmail()));
+
         // Validar duplicados
         if (iUserLoginRepository.existsByUsername(user.getUsername())) {
             throw new DuplicateResourceException("El nombre de usuario '" + user.getUsername() + "' ya está registrado.");
         }
-        if (iUserLoginRepository.existsByEmail(user.getEmail())) {
+        if (iUserLoginRepository.existsByEmailIgnoreCase(user.getEmail())) {
             throw new DuplicateResourceException("El correo '" + user.getEmail() + "' ya está registrado.");
         }
 
@@ -77,13 +81,16 @@ public class UserLoginService {
         if (userOptional.isPresent()) {
             UserLogin userDb = userOptional.get();
 
+            // Normalizar antes de comparar, para que las filas antiguas y las nuevas coincidan
+            user.setEmail(normalizeEmail(user.getEmail()));
+
             if (!userDb.getUsername().equals(user.getUsername())
                     && iUserLoginRepository.existsByUsername(user.getUsername())) {
                 throw new DuplicateResourceException("El nombre de usuario '" + user.getUsername() + "' ya está registrado.");
             }
             // Validar solo si cambió el email
-            if (!userDb.getEmail().equals(user.getEmail())
-                    && iUserLoginRepository.existsByEmail(user.getEmail())) {
+            if (!userDb.getEmail().equalsIgnoreCase(user.getEmail())
+                    && iUserLoginRepository.existsByEmailIgnoreCase(user.getEmail())) {
                 throw new DuplicateResourceException("El correo '" + user.getEmail() + "' ya está registrado.");
             }
 
@@ -98,6 +105,14 @@ public class UserLoginService {
 
     public void delete(Long id) {
         iUserLoginRepository.deleteById(id);
+    }
+
+    /**
+     * Stored emails are trimmed and lower-cased so that new rows always compare
+     * consistently, both against each other and against the login identifier.
+     */
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 
     // Método privado para asignar roles

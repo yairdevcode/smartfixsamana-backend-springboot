@@ -5,12 +5,14 @@ import com.smartfixsamana.auth.dto.LoginRequestDTO;
 import com.smartfixsamana.auth.dto.LoginResponseDTO;
 import com.smartfixsamana.models.entities.UserLogin;
 import com.smartfixsamana.models.repositories.IUserLoginRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,6 +23,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthenticationManager authenticationManager;
 
@@ -37,10 +41,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
         try {
-            // Autenticar al usuario delegando en Spring Security
+            // Autenticar al usuario delegando en Spring Security.
+            // El identificador puede ser el nombre de usuario o el correo electrónico.
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.username(),
+                            request.identifier(),
                             request.password()
                     )
             );
@@ -48,8 +53,10 @@ public class AuthController {
             // Generar token JWT firmado
             String token = jwtTokenProvider.generateToken(authentication);
 
-            // Buscar el usuario desde la base de datos
-            Optional<UserLogin> userOptional = userRepository.findByUsername(request.username());
+            // The authenticated principal is the canonical username, so this lookup
+            // works for email logins too. Using the raw request identifier here
+            // would return 404 whenever the user typed their email.
+            Optional<UserLogin> userOptional = userRepository.findByUsernameIgnoreCase(authentication.getName());
 
             if (userOptional.isPresent()) {
                 UserLogin user = userOptional.get();
@@ -68,8 +75,12 @@ public class AuthController {
 
             return ResponseEntity.status(404).body("Usuario no encontrado");
 
-        } catch (BadCredentialsException e) {
-            // Credenciales inválidas: contraseña incorrecta o usuario inexistente
+        } catch (AuthenticationException e) {
+            // Covers BadCredentialsException (wrong password or unknown identifier) and
+            // account state failures such as DisabledException / LockedException, which
+            // would otherwise escape as a 500. Never log the submitted password.
+            logger.warn("Failed login attempt for identifier '{}': {}", request.identifier(), e.getMessage());
+
             Map<String, String> error = new HashMap<>();
             error.put("error", "Error en la autenticación");
             error.put("message", "Credenciales inválidas");

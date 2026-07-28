@@ -9,11 +9,13 @@ import com.smartfixsamana.models.entities.UserLogin;
 
 public interface IUserLoginRepository extends CrudRepository<UserLogin, Long>{
 
-    Optional<UserLogin> findByUsername(String username);
+    Optional<UserLogin> findByUsernameIgnoreCase(String username);
+
+    Optional<UserLogin> findByEmailIgnoreCase(String email);
 
     boolean existsByUsername(String username);
 
-    boolean existsByEmail(String email);
+    boolean existsByEmailIgnoreCase(String email);
 
 
 }
