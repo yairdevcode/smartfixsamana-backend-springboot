@@ -60,6 +60,7 @@ public class SecurityConfig {
 
                                         //Celulares
                                 .requestMatchers(HttpMethod.GET, "/phones", "/phones/page/{page}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/phones", "/phones/search").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/phones/{id}").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/phones").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/phones/{id}").hasRole("ADMIN")
