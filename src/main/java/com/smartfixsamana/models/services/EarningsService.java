@@ -22,13 +22,19 @@ import java.util.List;
  * <p><b>Reparaciones propias:</b> ganancia = mano de obra + margen de repuestos
  * ({@code precio de venta - precio de compra}). Equivale a {@code totalCost - costo de compra de repuestos},
  * ya que {@code totalCost} ya incluye repuestos (a precio de venta) más mano de obra.</p>
- * <p><b>Reparaciones externas:</b> se usa {@code ExternalRepair.getMyShare()} y solo se incluyen
- * aquellas con estado {@code REPARADO} o {@code ENTREGADO}.</p>
+ * <p><b>Reparaciones externas:</b> la ganancia del taller es únicamente el 60&nbsp;% de la utilidad
+ * neta ({@code netProfit * 0.60}), <b>sin</b> el costo del repuesto: ese valor es recuperación de
+ * un gasto, no ganancia. Solo se incluyen las reparaciones con estado {@code REPARADO} o
+ * {@code ENTREGADO}.</p>
+ * <p>{@code ExternalRepair.getMyShare()} sigue existiendo sin cambios —devuelve
+ * {@code (netProfit * 0.60) + partCost}— porque el módulo de reparaciones externas y las
+ * liquidaciones sí necesitan incluir la recuperación del repuesto; este servicio no lo usa.</p>
  */
 @Service
 public class EarningsService {
 
     private static final ZoneId BUSINESS_ZONE = ZoneId.of("America/Bogota");
+    private static final double MY_SHARE_RATE = 0.60;
 
     private final IRepairRepository repairRepository;
     private final IExternalRepairRepository externalRepairRepository;
@@ -48,7 +54,7 @@ public class EarningsService {
 
         double ownTotal = round(computeOwnEarnings(repairs));
         double externalTotal = round(externalRepairs.stream()
-                .mapToDouble(ExternalRepair::getMyShare)
+                .mapToDouble(this::computeExternalShare)
                 .sum());
 
         return new DailyEarningsResponse(
@@ -67,7 +73,7 @@ public class EarningsService {
 
         double ownTotal = round(computeOwnEarnings(repairs));
         double externalTotal = round(externalRepairs.stream()
-                .mapToDouble(ExternalRepair::getMyShare)
+                .mapToDouble(this::computeExternalShare)
                 .sum());
 
         return new RangeEarningsResponse(
@@ -106,6 +112,15 @@ public class EarningsService {
         List<Long> repairIds = repairs.stream().map(Repair::getId).toList();
         double partsPurchaseCost = repairPartRepository.sumPurchaseCostByRepairIds(repairIds);
         return revenue - partsPurchaseCost;
+    }
+
+    /**
+     * Ganancia real del taller por una reparación externa dentro del módulo de Ganancias:
+     * solo el 60 % de la utilidad neta. NO incluye el costo del repuesto, porque ese valor
+     * es recuperación de un gasto, no ganancia.
+     */
+    private double computeExternalShare(ExternalRepair repair) {
+        return safe(repair.getNetProfit()) * MY_SHARE_RATE;
     }
 
     /**
