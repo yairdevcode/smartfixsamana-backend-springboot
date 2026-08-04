@@ -14,5 +14,7 @@ public record ExternalRepairDTO(
         Double partCost,
         @NotNull ExternalRepairStatus status,
         @NotNull LocalDate date,
-        String notes
+        String notes,
+        Long partCatalogId,
+        Integer partQuantity
 ) {}

@@ -4,6 +4,7 @@ import com.smartfixsamana.models.dto.ExternalRepairDTO;
 import com.smartfixsamana.models.dto.ExternalRepairResponse;
 import com.smartfixsamana.models.dto.ImportReconciliationResponse;
 import com.smartfixsamana.models.entities.ExternalRepair;
+import com.smartfixsamana.models.entities.PartCatalog;
 import com.smartfixsamana.models.enums.ExternalRepairStatus;
 import com.smartfixsamana.models.repositories.IExternalRepairRepository;
 import com.smartfixsamana.models.services.ExternalRepairExcelService.ExcelImportRow;
@@ -11,8 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,9 +28,15 @@ import java.util.stream.Collectors;
 public class ExternalRepairService {
 
     private final IExternalRepairRepository repository;
+    private final PartCatalogService partCatalogService;
+    private final InventoryMovementService inventoryMovementService;
 
-    public ExternalRepairService(IExternalRepairRepository repository) {
+    public ExternalRepairService(IExternalRepairRepository repository,
+                                  PartCatalogService partCatalogService,
+                                  InventoryMovementService inventoryMovementService) {
         this.repository = repository;
+        this.partCatalogService = partCatalogService;
+        this.inventoryMovementService = inventoryMovementService;
     }
 
     public Page<ExternalRepair> findAllPaginated(int page, int size, String sortBy, String sortDirection,
@@ -43,21 +52,141 @@ public class ExternalRepairService {
         return repository.findById(id);
     }
 
+    @Transactional
     public ExternalRepair save(ExternalRepairDTO dto) {
         ExternalRepair entity = new ExternalRepair();
         updateFromDTO(entity, dto);
-        return repository.save(entity);
+
+        if (dto.partCatalogId() == null) {
+            return repository.save(entity);
+        }
+
+        PartCatalog partCatalog = findPartCatalog(dto.partCatalogId());
+        Integer quantity = dto.partQuantity() != null ? dto.partQuantity() : 1;
+        validateStock(partCatalog, quantity);
+
+        entity.setPartCatalog(partCatalog);
+        entity.setPartQuantity(quantity);
+        applyPartCost(entity, dto, partCatalog, quantity);
+
+        // Persist first: the movement reason references the generated ID.
+        ExternalRepair saved = repository.save(entity);
+        inventoryMovementService.createExternalRepairUseMovement(partCatalog, saved, quantity,
+                "Usado en reparación externa #" + saved.getId());
+
+        return saved;
     }
 
+    @Transactional
     public ExternalRepair update(Long id, ExternalRepairDTO dto) {
         ExternalRepair entity = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("External repair not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Reparación externa no encontrada con ID: " + id));
+
+        // Capture the persisted part before updateFromDTO overwrites the entity.
+        PartCatalog oldPart = entity.getPartCatalog();
+        Integer oldQuantity = entity.getPartQuantity();
+        Long oldPartId = oldPart != null ? oldPart.getId() : null;
+
         updateFromDTO(entity, dto);
+
+        Long newPartId = dto.partCatalogId();
+        Integer newQuantity = newPartId != null
+                ? (dto.partQuantity() != null ? dto.partQuantity() : 1)
+                : null;
+
+        boolean unchanged = java.util.Objects.equals(oldPartId, newPartId)
+                && java.util.Objects.equals(oldQuantity, newQuantity);
+
+        if (unchanged) {
+            // Keep the existing selection; no stock movement.
+            entity.setPartCatalog(oldPart);
+            entity.setPartQuantity(oldQuantity);
+            if (newPartId != null) {
+                applyPartCost(entity, dto, oldPart, oldQuantity);
+            }
+            return repository.save(entity);
+        }
+
+        PartCatalog newPart = newPartId != null ? findPartCatalog(newPartId) : null;
+
+        // Validate the new consumption before touching any stock, so a failure leaves
+        // the old part still deducted rather than half-applied.
+        if (newPart != null) {
+            int available = newPart.getQuantity();
+            if (oldPart != null && oldPart.getId().equals(newPart.getId()) && oldQuantity != null) {
+                available += oldQuantity; // the old reservation is about to be returned
+            }
+            if (available < newQuantity) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Stock insuficiente. Disponible: " + available + ", Solicitado: " + newQuantity);
+            }
+        }
+
+        if (oldPart != null && oldQuantity != null) {
+            inventoryMovementService.createExternalRepairReturnMovement(oldPart, entity, oldQuantity,
+                    "Devuelto de reparación externa #" + id);
+        }
+
+        entity.setPartCatalog(newPart);
+        entity.setPartQuantity(newQuantity);
+
+        if (newPart != null) {
+            applyPartCost(entity, dto, newPart, newQuantity);
+            inventoryMovementService.createExternalRepairUseMovement(newPart, entity, newQuantity,
+                    "Usado en reparación externa #" + id);
+        }
+
         return repository.save(entity);
     }
 
+    @Transactional
     public void deleteById(Long id) {
+        ExternalRepair entity = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Reparación externa no encontrada con ID: " + id));
+
+        PartCatalog partCatalog = entity.getPartCatalog();
+        Integer quantity = entity.getPartQuantity();
+
+        if (partCatalog != null && quantity != null) {
+            // Return the stock before the repair disappears, otherwise it is silently lost.
+            inventoryMovementService.createExternalRepairReturnMovement(partCatalog, entity, quantity,
+                    "Devuelto de reparación externa #" + id);
+            entity.setPartCatalog(null);
+            entity.setPartQuantity(null);
+            repository.save(entity);
+        }
+
+        // Movements keep the stock history but must release the FK before the row goes away.
+        inventoryMovementService.detachExternalRepair(id);
+
         repository.deleteById(id);
+    }
+
+    private PartCatalog findPartCatalog(Long partCatalogId) {
+        return partCatalogService.findById(partCatalogId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Repuesto no encontrado en el catálogo con ID: " + partCatalogId));
+    }
+
+    private void validateStock(PartCatalog partCatalog, Integer quantity) {
+        if (partCatalog.getQuantity() < quantity) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Stock insuficiente. Disponible: " + partCatalog.getQuantity() +
+                    ", Solicitado: " + quantity);
+        }
+    }
+
+    /**
+     * Auto-fills partCost from the catalog purchase price (what was actually paid for the part,
+     * which is what getMyShare() reimburses). A manually typed cost always wins.
+     */
+    private void applyPartCost(ExternalRepair entity, ExternalRepairDTO dto, PartCatalog partCatalog, Integer quantity) {
+        if (dto.partCost() == null || dto.partCost() == 0.0) {
+            double purchasePrice = partCatalog.getPurchasePrice() != null ? partCatalog.getPurchasePrice() : 0.0;
+            entity.setPartCost(purchasePrice * quantity);
+        }
     }
 
     public List<ExternalRepair> findByDateRange(LocalDate startDate, LocalDate endDate) {

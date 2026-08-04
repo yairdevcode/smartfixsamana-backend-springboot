@@ -3,6 +3,8 @@ package com.smartfixsamana.auth;
 import java.util.Arrays;
 import java.util.List;
 
+import jakarta.servlet.DispatcherType;
+
 import com.smartfixsamana.auth.filter.JwtAuthenticationFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +54,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                                         //Clientes
                     athz -> athz
+                                // Spring Security also authorizes the internal ERROR dispatch. Without this,
+                                // every ResponseStatusException is forwarded to /error, blocked there, and
+                                // reaches the client as an empty 403 instead of its real status and message
+                                // (e.g. "Stock insuficiente" 400).
+                                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/customers", "/customers/page/{page}").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/customers/{id}").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/customers").hasRole("ADMIN")

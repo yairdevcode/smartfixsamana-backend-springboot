@@ -5,6 +5,8 @@ public enum MovementType {
     SALE,           // stock out - direct sale
     REPAIR_USE,     // stock out - used in repair
     REPAIR_RETURN,  // stock in - removed from repair
+    EXTERNAL_REPAIR_USE,     // stock out - used in external repair
+    EXTERNAL_REPAIR_RETURN,  // stock in - removed from external repair
     ADJUSTMENT,     // manual correction +/-
     DAMAGE          // stock out - damaged/lost
 }
