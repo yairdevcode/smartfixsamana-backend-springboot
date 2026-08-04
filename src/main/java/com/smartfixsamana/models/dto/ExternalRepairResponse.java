@@ -16,6 +16,9 @@ public record ExternalRepairResponse(
         LocalDate date,
         String notes,
         Long settlementId,
+        Long partCatalogId,
+        String partCatalogName,
+        Integer partQuantity,
         Double netProfit,
         Double myShare,
         Double storeShare
@@ -32,6 +35,9 @@ public record ExternalRepairResponse(
                 entity.getDate(),
                 entity.getNotes(),
                 entity.getSettlement() != null ? entity.getSettlement().getId() : null,
+                entity.getPartCatalog() != null ? entity.getPartCatalog().getId() : null,
+                entity.getPartCatalog() != null ? entity.getPartCatalog().getName() : null,
+                entity.getPartQuantity(),
                 entity.getNetProfit(),
                 entity.getMyShare(),
                 entity.getStoreShare()

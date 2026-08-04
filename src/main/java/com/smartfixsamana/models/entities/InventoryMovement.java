@@ -27,6 +27,10 @@ public class InventoryMovement implements Serializable {
 	@JoinColumn(name = "repair_id")
 	private Repair repair;
 
+	@ManyToOne
+	@JoinColumn(name = "external_repair_id")
+	private ExternalRepair externalRepair;
+
 	@Enumerated(EnumType.STRING)
 	@NotNull
 	private MovementType movementType;
@@ -69,6 +73,14 @@ public class InventoryMovement implements Serializable {
 
 	public void setRepair(Repair repair) {
 		this.repair = repair;
+	}
+
+	public ExternalRepair getExternalRepair() {
+		return externalRepair;
+	}
+
+	public void setExternalRepair(ExternalRepair externalRepair) {
+		this.externalRepair = externalRepair;
 	}
 
 	public MovementType getMovementType() {

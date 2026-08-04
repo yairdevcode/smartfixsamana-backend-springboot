@@ -18,6 +18,8 @@ public interface IInventoryMovementRepository extends JpaRepository<InventoryMov
 
     List<InventoryMovement> findByRepairIdOrderByCreatedAtDesc(Long repairId);
 
+    List<InventoryMovement> findByExternalRepairIdOrderByCreatedAtDesc(Long externalRepairId);
+
     /**
      * Paginated search with optional filters for partCatalogId, movementType, and date range.
      */

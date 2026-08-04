@@ -44,6 +44,13 @@ public class ExternalRepair implements Serializable {
     @JoinColumn(name = "settlement_id")
     private Settlement settlement;
 
+    @ManyToOne
+    @JoinColumn(name = "part_catalog_id")
+    private PartCatalog partCatalog;
+
+    @Column(name = "part_quantity")
+    private Integer partQuantity;
+
     // Computed getters
     public Double getNetProfit() {
         double cost = partCost != null ? partCost : 0.0;
@@ -138,6 +145,22 @@ public class ExternalRepair implements Serializable {
 
     public void setSettlement(Settlement settlement) {
         this.settlement = settlement;
+    }
+
+    public PartCatalog getPartCatalog() {
+        return partCatalog;
+    }
+
+    public void setPartCatalog(PartCatalog partCatalog) {
+        this.partCatalog = partCatalog;
+    }
+
+    public Integer getPartQuantity() {
+        return partQuantity;
+    }
+
+    public void setPartQuantity(Integer partQuantity) {
+        this.partQuantity = partQuantity;
     }
 
     @Serial

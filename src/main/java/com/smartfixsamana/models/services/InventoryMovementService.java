@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.smartfixsamana.models.dto.InventoryMovementDTO;
+import com.smartfixsamana.models.entities.ExternalRepair;
 import com.smartfixsamana.models.entities.InventoryMovement;
 import com.smartfixsamana.models.entities.PartCatalog;
 import com.smartfixsamana.models.entities.Repair;
@@ -38,6 +39,7 @@ public class InventoryMovementService {
     private boolean isStockIncrease(MovementType type) {
         return type == MovementType.PURCHASE ||
                type == MovementType.REPAIR_RETURN ||
+               type == MovementType.EXTERNAL_REPAIR_RETURN ||
                type == MovementType.ADJUSTMENT;
     }
 
@@ -47,6 +49,7 @@ public class InventoryMovementService {
     private boolean isStockDecrease(MovementType type) {
         return type == MovementType.SALE ||
                type == MovementType.REPAIR_USE ||
+               type == MovementType.EXTERNAL_REPAIR_USE ||
                type == MovementType.DAMAGE;
     }
 
@@ -124,6 +127,55 @@ public class InventoryMovementService {
         movement.setPartCatalog(partCatalog);
         movement.setRepair(repair);
         movement.setMovementType(MovementType.REPAIR_RETURN);
+        movement.setQuantity(quantity);
+        movement.setReason(reason);
+
+        // Return stock
+        partCatalog.setQuantity(partCatalog.getQuantity() + quantity);
+        partCatalogService.save(partCatalog);
+
+        return inventoryMovementRepository.save(movement);
+    }
+
+    /**
+     * Creates an EXTERNAL_REPAIR_USE movement when a part is used in an external repair.
+     */
+    @Transactional
+    public InventoryMovement createExternalRepairUseMovement(PartCatalog partCatalog, ExternalRepair externalRepair,
+                                                              Integer quantity, String reason) {
+        // Validate sufficient stock
+        if (partCatalog.getQuantity() < quantity) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Stock insuficiente. Disponible: " + partCatalog.getQuantity() +
+                ", Solicitado: " + quantity);
+        }
+
+        // Create movement
+        InventoryMovement movement = new InventoryMovement();
+        movement.setPartCatalog(partCatalog);
+        movement.setExternalRepair(externalRepair);
+        movement.setMovementType(MovementType.EXTERNAL_REPAIR_USE);
+        movement.setQuantity(quantity);
+        movement.setReason(reason);
+
+        // Update stock
+        partCatalog.setQuantity(partCatalog.getQuantity() - quantity);
+        partCatalogService.save(partCatalog);
+
+        return inventoryMovementRepository.save(movement);
+    }
+
+    /**
+     * Creates an EXTERNAL_REPAIR_RETURN movement when a part is removed from an external repair.
+     */
+    @Transactional
+    public InventoryMovement createExternalRepairReturnMovement(PartCatalog partCatalog, ExternalRepair externalRepair,
+                                                                 Integer quantity, String reason) {
+        // Create movement
+        InventoryMovement movement = new InventoryMovement();
+        movement.setPartCatalog(partCatalog);
+        movement.setExternalRepair(externalRepair);
+        movement.setMovementType(MovementType.EXTERNAL_REPAIR_RETURN);
         movement.setQuantity(quantity);
         movement.setReason(reason);
 
