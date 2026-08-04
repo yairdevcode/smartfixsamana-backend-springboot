@@ -158,6 +158,9 @@ public class ExternalRepairService {
             repository.save(entity);
         }
 
+        // Movements keep the stock history but must release the FK before the row goes away.
+        inventoryMovementService.detachExternalRepair(id);
+
         repository.deleteById(id);
     }
 

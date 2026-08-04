@@ -186,6 +186,21 @@ public class InventoryMovementService {
         return inventoryMovementRepository.save(movement);
     }
 
+    /**
+     * Clears the externalRepair reference on every movement of an external repair that is
+     * about to be deleted. The movements themselves are kept so the stock history survives,
+     * but they no longer point at a row that will not exist.
+     */
+    @Transactional
+    public void detachExternalRepair(Long externalRepairId) {
+        List<InventoryMovement> movements =
+                inventoryMovementRepository.findByExternalRepairIdOrderByCreatedAtDesc(externalRepairId);
+        for (InventoryMovement movement : movements) {
+            movement.setExternalRepair(null);
+        }
+        inventoryMovementRepository.saveAll(movements);
+    }
+
     public List<InventoryMovement> findAll() {
         return (List<InventoryMovement>) inventoryMovementRepository.findAll();
     }
