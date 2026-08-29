@@ -30,10 +30,22 @@ public interface IPartCatalogRepository extends JpaRepository<PartCatalog, Long>
            "(:phoneId IS NULL OR pc.phone.id = :phoneId)")
     List<PartCatalog> searchParts(@Param("name") String name, @Param("phoneId") Long phoneId);
 
-    @Query("SELECT pc FROM PartCatalog pc WHERE " +
-           "(:name IS NULL OR LOWER(pc.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
-           "(:phoneId IS NULL OR pc.phone.id = :phoneId) AND " +
-           "pc.quantity > 0")
+    /**
+     * Search parts that are in stock (quantity &gt; 0).
+     *
+     * <p>The keyword is matched against the part name, the phone brand and the phone model,
+     * joined into a single "name brand model" haystack, so a multi-word keyword such as
+     * "pantalla samsung a10" matches too. Every field is wrapped in COALESCE because MySQL's
+     * CONCAT returns NULL as soon as one argument is NULL, which would hide parts with no
+     * phone assigned. The join is a LEFT JOIN for that same reason.
+     */
+    @Query("SELECT pc FROM PartCatalog pc LEFT JOIN pc.phone p WHERE " +
+           "pc.quantity > 0 AND " +
+           "(:phoneId IS NULL OR p.id = :phoneId) AND " +
+           "(:name IS NULL OR LOWER(CONCAT(COALESCE(pc.name, ''), ' ', " +
+           "COALESCE(p.brand, ''), ' ', COALESCE(p.model, ''))) " +
+           "LIKE LOWER(CONCAT('%', :name, '%'))) " +
+           "ORDER BY pc.name ASC, p.brand ASC, p.model ASC")
     List<PartCatalog> searchAvailableParts(@Param("name") String name, @Param("phoneId") Long phoneId);
 
     /**
