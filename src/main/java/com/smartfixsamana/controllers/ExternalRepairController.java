@@ -44,10 +44,11 @@ public class ExternalRepairController {
             @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(required = false) ExternalRepairStatus status,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String keyword) {
 
         Page<ExternalRepair> result = externalRepairService.findAllPaginated(
-                page, size, sortBy, sortDirection, status, startDate, endDate);
+                page, size, sortBy, sortDirection, status, startDate, endDate, keyword);
 
         Page<ExternalRepairResponse> response = result.map(ExternalRepairResponse::fromEntity);
         return ResponseEntity.ok(response);

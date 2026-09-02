@@ -40,12 +40,16 @@ public class ExternalRepairService {
     }
 
     public Page<ExternalRepair> findAllPaginated(int page, int size, String sortBy, String sortDirection,
-                                                  ExternalRepairStatus status, LocalDate startDate, LocalDate endDate) {
+                                                  ExternalRepairStatus status, LocalDate startDate, LocalDate endDate,
+                                                  String keyword) {
         Sort sort = sortDirection.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return repository.findWithFilters(status, startDate, endDate, pageable);
+        // A blank keyword must reach the query as NULL, otherwise it runs LIKE '%%'
+        // instead of short-circuiting on the IS NULL branch.
+        String normalizedKeyword = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
+        return repository.findWithFilters(status, startDate, endDate, normalizedKeyword, pageable);
     }
 
     public Optional<ExternalRepair> findById(Long id) {
