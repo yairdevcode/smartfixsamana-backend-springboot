@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -63,7 +64,12 @@ public class CustomerService {
         Customer customer = iCustomerRepository.findById(customerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Cliente no encontrado con el ID: " + customerId));
-        iCustomerRepository.delete(customer);
+        try {
+            iCustomerRepository.delete(customer);
+            iCustomerRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar el cliente porque tiene reparaciones asociadas.");
+        }
     }
 
     public Page<Customer> findByKeyword(String keyword, Pageable pageable) {

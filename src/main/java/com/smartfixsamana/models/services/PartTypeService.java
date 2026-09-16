@@ -3,6 +3,7 @@ package com.smartfixsamana.models.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -87,7 +88,12 @@ public class PartTypeService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Tipo de repuesto no encontrado con ID: " + id);
         }
-        partTypeRepository.deleteById(id);
+        try {
+            partTypeRepository.deleteById(id);
+            partTypeRepository.flush();
+        }catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar el tipo porque tiene repustos asociados.");
+        }
     }
 
     /**
